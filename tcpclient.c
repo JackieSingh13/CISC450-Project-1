@@ -29,7 +29,7 @@ int main(void) {
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
   
    /* open a socket */
-
+   for (;;) {
    if ((sock_client = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
       perror("Client: can't open stream socket");
       exit(1);
@@ -78,7 +78,7 @@ int main(void) {
 
    printf("Please input a sentence:\n");
    scanf("%s", sentence);
-   if (!strcmp("exit\n", sentence)) {
+   if (!strncmp("exit", sentence, 4)) {
      break;
    }
    msg_len = strlen(sentence) + 1;
@@ -98,4 +98,5 @@ int main(void) {
    /* close the socket */
 
    close (sock_client);
+   }
 }
