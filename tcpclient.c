@@ -78,7 +78,8 @@ int main(void) {
 
    printf("Please input a sentence:\n");
    scanf("%s", sentence);
-   if (!strncmp("exit", sentence, 4)) {
+   if (!strncmp("disc", sentence, 4)) {
+     send (sock_client, "disc", 4, 0);
      break;
    }
    msg_len = strlen(sentence) + 1;
