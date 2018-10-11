@@ -88,13 +88,19 @@ int main(void) {
          close(sock_server);
          exit(1);
       }
- 
+
+      printf("Connection successful.\n");
+
       for (;;) {
       /* receive the message */
 
       bytes_recd = recv(sock_connection, sentence, STRING_SIZE, 0);
 
       if (bytes_recd > 0){
+	 if (!strncmp("disc", sentence, 4)) {
+	   printf("Closing connection");
+	   break;
+	 }
          printf("Received Sentence is:\n");
          printf("%s", sentence);
          printf("\nwith length %d\n\n", bytes_recd);
