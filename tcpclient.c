@@ -70,23 +70,29 @@ int main(void) {
       close(sock_client);
       exit(1);
    }
-  
+
    /* user interface */
+  for (;;) {
 
    printf("Please input a sentence:\n");
    scanf("%s", sentence);
+   if (!strcmp("exit\n", sentence) {
+     break;
+   }
    msg_len = strlen(sentence) + 1;
 
    /* send message */
-   
+
    bytes_sent = send(sock_client, sentence, msg_len, 0);
 
    /* get response from server */
-  
+
    bytes_recd = recv(sock_client, modifiedSentence, STRING_SIZE, 0); 
 
    printf("\nThe response from server is:\n");
    printf("%s\n\n", modifiedSentence);
+
+  }
 
    /* close the socket */
 
