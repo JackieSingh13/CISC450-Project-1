@@ -62,7 +62,7 @@ int main(void) {
       perror("Server: can't bind to local address");
       close(sock_server);
       exit(1);
-   }                     
+   }
 
    /* listen for incoming requests from clients */
 
@@ -89,6 +89,7 @@ int main(void) {
          exit(1);
       }
  
+      for (;;) {
       /* receive the message */
 
       bytes_recd = recv(sock_connection, sentence, STRING_SIZE, 0);
@@ -108,6 +109,7 @@ int main(void) {
          /* send message */
  
          bytes_sent = send(sock_connection, modifiedSentence, msg_len, 0);
+	}
       }
 
       /* close the socket */

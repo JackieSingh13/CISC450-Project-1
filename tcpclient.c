@@ -63,7 +63,8 @@ int main(void) {
    server_addr.sin_port = htons(server_port);
 
     /* connect to the server */
- 		
+
+
    if (connect(sock_client, (struct sockaddr *) &server_addr, 
                                     sizeof (server_addr)) < 0) {
       perror("Client: can't connect to server");
@@ -72,11 +73,12 @@ int main(void) {
    }
 
    /* user interface */
-  for (;;) {
+
+   for (;;) {
 
    printf("Please input a sentence:\n");
    scanf("%s", sentence);
-   if (!strcmp("exit\n", sentence) {
+   if (!strcmp("exit\n", sentence)) {
      break;
    }
    msg_len = strlen(sentence) + 1;
@@ -91,8 +93,7 @@ int main(void) {
 
    printf("\nThe response from server is:\n");
    printf("%s\n\n", modifiedSentence);
-
-  }
+   }
 
    /* close the socket */
 
