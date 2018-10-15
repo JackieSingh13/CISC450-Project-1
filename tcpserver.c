@@ -16,7 +16,7 @@
    incoming requests from clients. You should change this to a different
    number to prevent conflicts with others in the class. */
 
-#define SERV_TCP_PORT 65006
+#define SERV_TCP_PORT 65007
 
 int main(void) {
 
@@ -38,15 +38,17 @@ int main(void) {
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    unsigned int i;  /* temporary loop variable */
 
+   int checking, savings = 0;
+
    /* open a socket */
 
    if ((sock_server = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
       perror("Server: can't open stream socket");
-      exit(1);                                                
+      exit(1);
    }
 
    /* initialize server address information */
-    
+
    memset(&server_addr, 0, sizeof(server_addr));
    server_addr.sin_family = AF_INET;
    server_addr.sin_addr.s_addr = htonl (INADDR_ANY);  /* This allows choice of
@@ -84,7 +86,7 @@ int main(void) {
                      /* The accept function blocks the server until a
                         connection request comes from a client */
       if (sock_connection < 0) {
-         perror("Server: accept() error\n"); 
+         perror("Server: accept() error\n");
          close(sock_server);
          exit(1);
       }
@@ -95,31 +97,54 @@ int main(void) {
       /* receive the message */
 
       bytes_recd = recv(sock_connection, sentence, STRING_SIZE, 0);
+      printf("Received message is: %s\n", sentence);
 
       if (bytes_recd > 0){
 	 if (!strncmp("disc", sentence, 4)) {
-	   printf("Closing connection");
+	   printf("Closing connection.\n");
 	   break;
 	 }
-         printf("Received Sentence is:\n");
-         printf("%s", sentence);
-         printf("\nwith length %d\n\n", bytes_recd);
+	 char value[20];
+	 if (!strncmp("chck", sentence, 4)) {
+		send(sock_connection, "Account:", 7, 0);
+		recv(sock_connection, sentence, STRING_SIZE, 0);
+		if (!strncmp("savings", sentence, 7)) {
+			sprintf(value, "%d", savings);
+			send(sock_connection, value, strlen(value), 0);
+		}
+		else if (!strncmp("checking", sentence, 8)) {
+			scanf(value, "%d", checking);
+			send(sock_connection, value, strlen(value), 0);
+		}
+		else {
+			send(sock_connection, "Invalid", 7, 0);
+		}
+		send(sock_connection, "Completed", 8, 0);
+	 }
+	 if (!strncmp("depo", sentence, 4)) {
+		send(sock_connection, "Account:", 8, 0);
+		recv(sock_connection, sentence, STRING_SIZE, 0);
+		if (!strncmp("savings", sentence, 7)) {
+			savings += atoi(sentence);
+		}
+		else if (!strncmp("checking", &sentence[5], 8)) {
+			checking += atoi(sentence);
+		}
+		else {
+			send(sock_connection, "Invalid", 7, 0);
+		}
+		send(sock_connection, "Completed", 8, 0);
+	 }
+	 if (!strncmp("with", sentence, 4)) {
 
-        /* prepare the message to send */
+	 }
+	 if (!strncmp("tran", sentence, 4)) {
 
-         msg_len = bytes_recd;
-
-         for (i=0; i<msg_len; i++)
-            modifiedSentence[i] = toupper (sentence[i]);
-
-         /* send message */
- 
-         bytes_sent = send(sock_connection, modifiedSentence, msg_len, 0);
+	 }
+//         printf("Received message is: %s", sentence);
 	}
       }
-
       /* close the socket */
-
       close(sock_connection);
-   } 
+   }
 }
