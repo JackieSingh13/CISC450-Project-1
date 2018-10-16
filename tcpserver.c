@@ -16,7 +16,7 @@
    incoming requests from clients. You should change this to a different
    number to prevent conflicts with others in the class. */
 
-#define SERV_TCP_PORT 65007
+#define SERV_TCP_PORT 65006
 
 int main(void) {
 
@@ -38,7 +38,8 @@ int main(void) {
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    unsigned int i;  /* temporary loop variable */
 
-   int checking, savings = 0;
+   int checking = 0;
+   int savings = 0;
 
    /* open a socket */
 
@@ -74,7 +75,7 @@ int main(void) {
       exit(1);
    }
    printf("I am here to listen ... on port %hu\n\n", server_port);
-  
+
    client_addr_len = sizeof (client_addr);
 
    /* wait for incoming connection requests in an indefinite loop */
@@ -93,9 +94,11 @@ int main(void) {
 
       printf("Connection successful.\n");
 
-      for (;;) {
+  //    for (;;) {
       /* receive the message */
+      send(sock_connection, "Specify a command. (chck, depo, with, tran, disc):\n", 51, 0);
 
+      for (;;) {
       bytes_recd = recv(sock_connection, sentence, STRING_SIZE, 0);
       printf("Received message is: %s\n", sentence);
 
@@ -106,34 +109,43 @@ int main(void) {
 	 }
 	 char value[20];
 	 if (!strncmp("chck", sentence, 4)) {
-		send(sock_connection, "Account:", 7, 0);
+		send(sock_connection, "Specify (checking or savings):\n", 32, 0);
 		recv(sock_connection, sentence, STRING_SIZE, 0);
 		if (!strncmp("savings", sentence, 7)) {
-			sprintf(value, "%d", savings);
+			sprintf(value, "Balance of savings is: %d \n\nEnter new command:\n", savings);
 			send(sock_connection, value, strlen(value), 0);
 		}
 		else if (!strncmp("checking", sentence, 8)) {
-			scanf(value, "%d", checking);
+			sprintf(value, "Balance of checking is: %d \n\nEnter new command:\n", checking);
 			send(sock_connection, value, strlen(value), 0);
 		}
 		else {
 			send(sock_connection, "Invalid", 7, 0);
 		}
-		send(sock_connection, "Completed", 8, 0);
+		continue;
 	 }
 	 if (!strncmp("depo", sentence, 4)) {
-		send(sock_connection, "Account:", 8, 0);
+		send(sock_connection, "Specify (checking or savings):\n", 32, 0);
 		recv(sock_connection, sentence, STRING_SIZE, 0);
 		if (!strncmp("savings", sentence, 7)) {
+			sprintf(value, "Balance before transaction: %d \nEnter amount:\n", savings);
+                        send(sock_connection, value, strlen(value), 0);
+			recv(sock_connection, sentence, 8, 0);
 			savings += atoi(sentence);
+			sprintf(value, "Balance after: %d \nEnter new command:\n", savings);
+			send(sock_connection, value, strlen(value), 0);checking += atoi(sentence);
 		}
-		else if (!strncmp("checking", &sentence[5], 8)) {
-			checking += atoi(sentence);
+		else if (!strncmp("checking", sentence, 8)) {
+			sprintf(value, "Balance before transaction: %d \nEnter amount:\n", checking);
+                        send(sock_connection, value, strlen(value), 0);
+                        recv(sock_connection, sentence, 8, 0);
+                        checking += atoi(sentence);
+                        sprintf(value, "Balance after: %d \nEnter new command:\n", checking);
+                        send(sock_connection, value, strlen(value), 0);
 		}
 		else {
 			send(sock_connection, "Invalid", 7, 0);
 		}
-		send(sock_connection, "Completed", 8, 0);
 	 }
 	 if (!strncmp("with", sentence, 4)) {
 
