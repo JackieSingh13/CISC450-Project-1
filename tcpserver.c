@@ -147,13 +147,44 @@ int main(void) {
 			send(sock_connection, "Invalid", 7, 0);
 		}
 	 }
+	 if (!strncmp("tran", sentence, 4)) {
+		send(sock_connection, "Specify destination (checking or saving):\n", 50, 0);
+		recv(sock_connection, sentence, STRING_SIZE, 0);
+		 if (!strncmp("savings", sentence, 7)) {
+                        sprintf(value, "Balance of checking before: %d Balance of savings before: %d \nEnter amount:\n", checking, savings);
+                        send(sock_connection, value, strlen(value), 0);
+                        recv(sock_connection, sentence, 8, 0);
+			if ((checking - atoi(sentence)) >= 0) {
+                        	savings += atoi(sentence);
+				checking -= atoi(sentence);
+                       		sprintf(value, "Balance of checking: %d Balance of savings: %d\nEnter new command:\n", checking, savings);
+                        	send(sock_connection, value, strlen(value), 0);
+			} else {
+				send(sock_connection, "Error: overdraft.\nEnter new command:\n", 50, 0);
+			}
+                }
+                else if (!strncmp("checking", sentence, 8)) {
+                        sprintf(value, "Balance of checking before: %d Balance of savings before: %d \nEnter amount:\n", checking, savings);
+                        send(sock_connection, value, strlen(value), 0);
+                        recv(sock_connection, sentence, 8, 0);
+                        if ((savings - atoi(sentence)) >= 0) {
+                                savings -= atoi(sentence);
+                                checking += atoi(sentence);
+                                sprintf(value, "Balance of checking: %d Balance of savings: %d\nEnter new command:\n", checking, savings);
+                                send(sock_connection, value, strlen(value), 0);
+                        } else {
+                                send(sock_connection, "Error: overdraft.\nEnter new command:\n", 50, 0);
+                        }
+
+                }
+                else {
+                        send(sock_connection, "Invalid", 7, 0);
+                }
+
+	 }
 	 if (!strncmp("with", sentence, 4)) {
 
 	 }
-	 if (!strncmp("tran", sentence, 4)) {
-
-	 }
-//         printf("Received message is: %s", sentence);
 	}
       }
       /* close the socket */
